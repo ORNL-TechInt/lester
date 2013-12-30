@@ -1,0 +1,54 @@
+Lester, the Lustre lister
+
+Lester is an extention of e2scan for generating lists of files (and potentially
+their attributes) from a ext2/ext3/ext4/ldiskfs filesystem. We primarily use it
+for generating a purge candidate list, but it is also useful for generating a
+list of files affected by an OST outage or providing a name for an inode.
+
+For example, to list files that have not been accessed in two weeks and
+put the output in ne2scan format in $OUTFILE:
+
+	touch -d 'now - 2 weeks' /tmp/flag
+	lester -A fslist -a before=/tmp/flag -o $OUTFILE $BLOCKDEV
+
+To do the same thing, but generate a full listing of the filesystem in
+parallel:
+
+	touch -d 'now - 2 weeks' /tmp/flag
+	lester -A fslist -a before=/tmp/flag -a genhit=$UNACCESSED_LIST \
+		-o $FULL_LIST $BLOCKDEV
+
+To name inodes to stdout (when not using Lustre 2.4's LINKEA):
+
+	lester -A namei -a $INODE1 -a $INODE2 ... $BLOCKDEV
+
+To get a list of files with objects on OSTs 999 and 1000:
+
+	lester -A lsost -a 999 -a 1000 -o $OUTFILE $BLOCKDEV
+
+To get a list of options and actions, use 'lester -h'; to get a list of
+options for a given action, use 'lester -A $ACTION -a help'.
+
+Lester uses its own AIO-based IO engine by default, which is usually much
+faster than the default Unix engine for large filesystems on high-performance
+devices. The number of requests in flight, request size, cache size, and
+read-ahead settings for various phases of the scan are all configurable. I
+recommend experimenting with the settings to find a balance between speed and
+resource usage for your situation.
+
+-- David Dillow
+
+
+DEPENDENCIES
+
+libext2fs-devel		1.42.7 or newer (Lustre version preferred)
+libcom_err-devel	1.42.7 or newer (Lustre version preferred)
+libaio-devel
+
+Older e2fsprogs libraries may work, but have not been tested
+
+BUILDING
+
+./bootstrap (if building from git repo)
+./configure
+make
