@@ -22,6 +22,9 @@
 #ifndef EXT2_XATTR_INDEX_LUSTRE
 #define EXT2_XATTR_INDEX_LUSTRE		5
 #endif
+#ifndef EXT2_XATTR_INDEX_SECURITY
+#define EXT2_XATTR_INDEX_SECURITY	6
+#endif
 
 /* From lustre_idl.h */
 #define LOV_MAGIC_V1	0x0BD10BD0
